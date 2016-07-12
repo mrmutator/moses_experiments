@@ -23,7 +23,7 @@ class Test(object):
 
 
 def check_paths(params):
-    check_list = ["e_file_gz", "moses_dir"]
+    check_list = ["e_file_gz", "f_file_gz", "target_dir", "alignment_file", "language_model", "moses_dir"]
     for c in check_list:
         if not os.path.exists(params[c]):
             raise Exception("Path does not exist for parameter %s: <%s>" % (c, params[c]))
