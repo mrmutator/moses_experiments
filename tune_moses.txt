@@ -10,7 +10,7 @@ cp %(f_dev_gz)s tune.fr.gz
 gunzip tune.*.gz
 cp %(language_model)s model/lm.blm.en
 
-sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/\1\  g" model/moses.ini
+sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/model/\1\  g" model/moses.ini
 
 %(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
 
