@@ -10,10 +10,10 @@ cp %(f_test_gz)s test.fr.gz
 gunzip test.*.gz
 cp %(language_model)s model/lm.blm.en
 
-sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/model/\1\  g" model/tuned.moses.ini
+sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/model/\1\  g" model/moses.tuned.ini
 
-sed -i -r "s/reordering-table/reordering-table.minlexr/" model/tuned.moses.ini
-%(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset model/tuned.moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
+sed -i -r "s/reordering-table/reordering-table.minlexr/" model/moses.tuned.ini
+%(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset model/moses.tuned.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
 sed -i -r "s/reordering-table.minlexr/reordering-table/" filtered-testset/moses.ini
 
 %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en
