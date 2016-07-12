@@ -1,0 +1,17 @@
+#PBS -S /bin/bash
+#PBS -lnodes=1:cores16
+#PBS -lwalltime=%(wall_time)s
+
+cd "$TMPDIR"
+mkdir train
+mkdir train/model
+
+cp %(e_file_gz)s corpus.en.gz
+cp %(f_file_gz)s corpus.fr.gz
+cp %(alignment_file)s aligned.grow-diag-final
+gunzip corpus.*.gz
+cp %(language_model)s lm.blm.en
+
+%(moses_dir)s/scripts/training/train-model.perl -root-dir $PWD/train -corpus $PWD/corpus -f fr -e en -reordering msd-bidirectional-fe -lm 0:3:$PWD/lm.blm.en:8 -external-bin-dir %(moses_dir)s/tools --first-step 4 --alignment-file $PWD/aligned -cores %(num_cores)s
+
+cp -r train/model %(target_dir)s/model
