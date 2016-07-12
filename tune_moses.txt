@@ -1,0 +1,17 @@
+#PBS -S /bin/bash
+#PBS -lnodes=1:cores16
+#PBS -lwalltime=%(wall_time)s
+
+cd "$TMPDIR"
+
+cp -r %(model_dir)s model/
+cp %(e_dev_gz)s tune.en.gz
+cp %(f_dev_gz)s tune.fr.gz
+gunzip tune.*.gz
+cp %(language_model)s model/lm.blm.en
+
+sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/\1\  g" model/moses.ini
+
+%(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
+
+cp -r mert-work/moses.ini %(model_dir)s/moses.tuned.ini
