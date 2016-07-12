@@ -14,4 +14,15 @@ sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/model/\1\  g" model/moses.ini
 
 %(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
 
+# binarizing
+mkdir binarised-model
+%(moses_dir)s/bin/processPhraseTableMin -in model/phrase-table.gz -nscores 4 -out binarised_model/phrase-table
+%(moses_dir)s/bin/processLexicalTableMin-in model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
+sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
+sed -i "s/phrase-table.gz/phrase-table.minphr/" mert-work/moses.ini
+sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table/" mert-work/moses.ini
+cp binarised_model/phrase-table.minphr %(model_dir)s/phrase-table.minphr
+cp binarised_model/reordering-table %(model_dir)s/reordering-table
+
+
 cp -r mert-work/moses.ini %(model_dir)s/moses.tuned.ini
