@@ -21,8 +21,8 @@ mkdir binarised-model
 sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
 sed -i "s/phrase-table.gz/phrase-table.minphr/" mert-work/moses.ini
 sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table/" mert-work/moses.ini
-cp binarised_model/phrase-table.minphr %(model_dir)s/phrase-table.minphr
-cp binarised_model/reordering-table %(model_dir)s/reordering-table
+cp binarised-model/phrase-table.minphr %(model_dir)s/phrase-table.minphr
+cp binarised-model/reordering-table %(model_dir)s/reordering-table.minlexr
 
 
 cp -r mert-work/moses.ini %(model_dir)s/moses.tuned.ini
