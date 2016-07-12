@@ -1,0 +1,13 @@
+#PBS -S /bin/bash
+#PBS -lnodes=1:cores16
+#PBS -lwalltime=%(wall_time)s
+
+cd "$TMPDIR"
+mkdir lm
+cd lm
+cp %(e_file_gz)s corpus.e.gz
+gunzip corpus.e.gz
+%(moses_dir)s/bin/lmplz -o 3 < corpus.e > corpus.lm.arpa.e
+%(moses_dir)s/bin/build_binary corpus.lm.arpa.e corpus.lm.blm.e
+
+cp corpus.lm.blm.e %(target_file)s
