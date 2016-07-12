@@ -3,7 +3,7 @@ import argparse
 
 arg_parser = argparse.ArgumentParser()
 
-arg_parser.add_argument("alignment_file", required=True)
+arg_parser.add_argument("alignment_file")
 
 args = arg_parser.parse_args()
 
