@@ -32,7 +32,6 @@ rm corpus.fr
 mkdir binarised-model
 %(moses_dir)s/bin/processPhraseTableMin -in train/model/phrase-table.gz -nscores 4 -out binarised-model/phrase-table
 %(moses_dir)s/bin/processLexicalTableMin -in train/model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
-cp lm.blm.en binarised-model/
 
 
 # TUNING
@@ -50,15 +49,16 @@ for it in $(seq 1 %(num_mert)s);
 
  sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
  sed -i "s/phrase-table.gz/phrase-table.minphr/" mert-work/moses.ini
- sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table/" mert-work/moses.ini
+ sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table.minlexr/" mert-work/moses.ini
+
+ sed -i "s train/model/phrase-table.minphr binarised-model/phrase-table.minphr " mert-work/moses.ini
+ sed -i "s train/model/reordering-table.minlexr binarised-model/reordering-table.minlexr " mert-work/moses.ini
 
 
  # TESTING
  ##########################################
 
- sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/binarised-model/\1\  g" mert-work/moses.ini
 
- sed -i -r "s/reordering-table/reordering-table.minlexr/" mert-work/moses.ini
  >&2 echo "Filtering test set. ";
  %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
  sed -i -r "s/reordering-table.minlexr/reordering-table/" filtered-testset/moses.ini
