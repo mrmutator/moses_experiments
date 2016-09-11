@@ -1,0 +1,70 @@
+#PBS -S /bin/bash
+#PBS -lnodes=1:cores16
+#PBS -lwalltime=%(wall_time)s
+
+cd "$TMPDIR"
+
+# TRAINING
+###################################
+
+mkdir train
+mkdir train/model
+
+cp %(e_train_gz)s corpus.en.gz
+cp %(f_train_gz)s corpus.fr.gz
+cp %(alignment_file)s aligned.grow-diag-final
+cp %(e_dev_gz)s tune.en.gz
+cp %(f_dev_gz)s tune.fr.gz
+cp %(e_test_gz)s test.en.gz
+cp %(f_test_gz)s test.fr.gz
+
+gunzip corpus.*.gz
+cp %(language_model)s lm.blm.en
+
+%(moses_dir)s/scripts/training/train-model.perl -root-dir $PWD/train -corpus $PWD/corpus -f fr -e en -reordering msd-bidirectional-fe -lm 0:3:$PWD/lm.blm.en:8 -external-bin-dir %(moses_dir)s/tools --first-step 4 --alignment-file $PWD/aligned -cores %(num_cores)s
+
+
+rm corpus.en
+rm corpus.fr
+
+# binarizing
+mkdir binarised-model
+%(moses_dir)s/bin/processPhraseTableMin -in train/model/phrase-table.gz -nscores 4 -out binarised-model/phrase-table
+%(moses_dir)s/bin/processLexicalTableMin -in train/model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
+cp lm.blm.en binarized-model/
+
+
+# TUNING
+######################################
+
+gunzip tune.*.gz
+gunzip test.*.gz
+
+# run several times
+for it in $(seq 1 %(num_mert)s);
+ do
+
+ %(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses train/model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
+
+
+ sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
+ sed -i "s/phrase-table.gz/phrase-table.minphr/" mert-work/moses.ini
+ sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table/" mert-work/moses.ini
+
+
+ # TESTING
+ ##########################################
+
+ sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/binarised-model/\1\  g" mert-work/moses.ini
+
+ sed -i -r "s/reordering-table/reordering-table.minlexr/" mert-work/moses.ini
+ %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
+ sed -i -r "s/reordering-table.minlexr/reordering-table/" filtered-testset/moses.ini
+
+ %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en.$it
+
+
+ rm -r filtered-testset
+ rm -r mert-work
+done
+cp translated.en.* %(result_dir)s/
