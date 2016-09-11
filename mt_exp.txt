@@ -20,7 +20,7 @@ cp %(f_test_gz)s test.fr.gz
 
 gunzip corpus.*.gz
 cp %(language_model)s lm.blm.en
-
+>&2 echo "Starting training script. ";
 %(moses_dir)s/scripts/training/train-model.perl -root-dir $PWD/train -corpus $PWD/corpus -f fr -e en -reordering msd-bidirectional-fe -lm 0:3:$PWD/lm.blm.en:8 -external-bin-dir %(moses_dir)s/tools --first-step 4 --alignment-file $PWD/aligned -cores %(num_cores)s
 
 
@@ -28,6 +28,7 @@ rm corpus.en
 rm corpus.fr
 
 # binarizing
+>&2 echo "Starting binarizer script. ";
 mkdir binarised-model
 %(moses_dir)s/bin/processPhraseTableMin -in train/model/phrase-table.gz -nscores 4 -out binarised-model/phrase-table
 %(moses_dir)s/bin/processLexicalTableMin -in train/model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
@@ -43,7 +44,7 @@ gunzip test.*.gz
 # run several times
 for it in $(seq 1 %(num_mert)s);
  do
-
+ >&2 echo "Starting MERT run " ${it};
  %(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses train/model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
 
 
@@ -58,9 +59,11 @@ for it in $(seq 1 %(num_mert)s);
  sed -i -r "s path=/.*/([^\/]+)\b path=${PWD}/binarised-model/\1\  g" mert-work/moses.ini
 
  sed -i -r "s/reordering-table/reordering-table.minlexr/" mert-work/moses.ini
+ >&2 echo "Filtering test set. ";
  %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
  sed -i -r "s/reordering-table.minlexr/reordering-table/" filtered-testset/moses.ini
 
+ >&2 echo "Translating test set. ";
  %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en.$it
 
  cp translated.en.$it %(result_dir)s/
