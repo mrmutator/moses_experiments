@@ -48,11 +48,8 @@ for it in $(seq 1 %(num_mert)s);
 
 
  sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
- sed -i "s/phrase-table.gz/phrase-table.minphr/" mert-work/moses.ini
- sed -i "s/reordering-table.wbe-msd-bidirectional-fe.gz/reordering-table.minlexr/" mert-work/moses.ini
-
- sed -i "s train/model/phrase-table.minphr binarised-model/phrase-table.minphr " mert-work/moses.ini
- sed -i "s train/model/reordering-table.minlexr binarised-model/reordering-table.minlexr " mert-work/moses.ini
+ sed -i "s train/model/phrase-table.gz binarised-model/phrase-table " mert-work/moses.ini
+ sed -i "s train/model/reordering-table.wbe-msd-bidirectional-fe.gz binarised-model/reordering-table.minlexr " mert-work/moses.ini
 
 
  # TESTING
@@ -61,7 +58,6 @@ for it in $(seq 1 %(num_mert)s);
 
  >&2 echo "Filtering test set. ";
  %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
- sed -i -r "s/reordering-table.minlexr/reordering-table/" filtered-testset/moses.ini
 
  >&2 echo "Translating test set. ";
  %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en.$it
