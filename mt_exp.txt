@@ -63,8 +63,7 @@ for it in $(seq 1 %(num_mert)s);
 
  %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en.$it
 
-
+ cp translated.en.$it %(result_dir)s/
  rm -r filtered-testset
  rm -r mert-work
 done
-cp translated.en.* %(result_dir)s/
