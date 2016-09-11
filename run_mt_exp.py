@@ -42,7 +42,7 @@ def get_params(args):
     params['result_dir'] = os.path.abspath(args.result_dir)
     params['alignment_file'] = os.path.abspath(args.alignment_file)
     params['language_model'] = os.path.join(os.path.abspath(args.corpus_dir), "lm.blm." + args.e)
-    params['job_file'] = os.path.join(params['result_dir'], "training.job")
+    params['job_file'] = os.path.join(params['result_dir'], "mt_exp.job")
     params['job_template_dir'] = os.path.dirname(os.path.realpath(__file__))
     params['wall_time'] = args.wall_time
     params['moses_dir'] = os.path.abspath(args.moses_dir)
