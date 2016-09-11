@@ -32,7 +32,7 @@ rm corpus.fr
 mkdir binarised-model
 %(moses_dir)s/bin/processPhraseTableMin -in train/model/phrase-table.gz -nscores 4 -out binarised-model/phrase-table
 %(moses_dir)s/bin/processLexicalTableMin -in train/model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
-cp lm.blm.en binarized-model/
+cp lm.blm.en binarised-model/
 
 
 # TUNING
