@@ -62,9 +62,9 @@ for it in $(seq 1 %(num_mert)s);
  %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
 
  >&2 echo "Translating test set. ";
- %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > translated.en.$it
+ %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > %(rev_prefix)stranslated.en.$it
 
- cp translated.en.$it %(result_dir)s/
+ cp %(rev_prefix)stranslated.en.$it %(result_dir)s/
  rm -r filtered-testset
  rm -r mert-work
 done
