@@ -18,6 +18,8 @@ cp %(f_dev_gz)s tune.fr.gz
 cp %(e_test_gz)s test.en.gz
 cp %(f_test_gz)s test.fr.gz
 
+%(reverse)s
+
 gunzip corpus.*.gz
 cp %(language_model)s lm.blm.en
 >&2 echo "Starting training script. ";

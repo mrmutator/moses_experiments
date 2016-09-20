@@ -48,6 +48,11 @@ def get_params(args):
     params['moses_dir'] = os.path.abspath(args.moses_dir)
     params['num_cores'] = args.num_cores
     params['num_mert'] = args.num_mert
+    if args.reverse:
+        params["reverse"] = "python " + os.path.join(params["job_template_dir"], "swap_alignment_file.py") + "aligned.grow-diag-final\nmv aligned.grow-diag-final.swapped aligned.grow-diag-final"
+        params["job_file"] =  params["job_file"] +  ".reverse"
+    else:
+        params["reverse"] = ""
 
     return params
 
@@ -78,6 +83,7 @@ arg_parser.add_argument("-num_mert", required=False, default=5, type=int)
 arg_parser.add_argument("-wall_time", required=False, default="05:00:00", type=str)
 arg_parser.add_argument("-moses_dir", required=False, default=os.getenv("HOME") + "/mosesdecoder", type=str)
 arg_parser.add_argument("-num_cores", required=False, default=16, type=int)
+arg_parser.add_argument("-reverse", required=False, dest="reverse", action='store_true')
 arg_parser.add_argument('-no_sub', dest='no_sub', action='store_true', required=False)
 arg_parser.set_defaults(no_sub=False)
 args = arg_parser.parse_args()
