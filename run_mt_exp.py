@@ -49,7 +49,7 @@ def get_params(args):
     params['num_cores'] = args.num_cores
     params['num_mert'] = args.num_mert
     if args.reverse:
-        params["reverse"] = "python " + os.path.join(params["job_template_dir"], "swap_alignment_file.py") + "aligned.grow-diag-final\nmv aligned.grow-diag-final.swapped aligned.grow-diag-final"
+        params["reverse"] = "python " + os.path.join(params["job_template_dir"], "swap_alignment_file.py") + " aligned.grow-diag-final\nmv aligned.grow-diag-final.swapped aligned.grow-diag-final"
         params["job_file"] =  params["job_file"] +  ".reverse"
     else:
         params["reverse"] = ""
