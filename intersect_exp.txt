@@ -12,8 +12,8 @@ mkdir train/model
 
 cp %(e_train_gz)s corpus.en.gz
 cp %(f_train_gz)s corpus.fr.gz
-cp %(alignment_file_1)s aligned1
-cp %(alignment_file_2)s aligned2
+cp %(alignment_file1)s aligned1
+cp %(alignment_file2)s aligned2
 cp %(e_dev_gz)s tune.en.gz
 cp %(f_dev_gz)s tune.fr.gz
 cp %(e_test_gz)s test.en.gz
