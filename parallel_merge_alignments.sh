@@ -16,7 +16,7 @@ split -l $nm $2 file2.
 for f in file1.*; do
     r="${f/file1/file2}"
     sfx="${f/file1./}"
-    python $BASEDIR/merge_alignments.py --filename merged.$sfx --grow-diag-final $f $r &
+    python $BASEDIR/merge_alignments.py --filename merged.$sfx --grow-diag-final $f $r  2> /dev/null &
 done
 wait
 cat merged.* > aligned.grow-diag-final
