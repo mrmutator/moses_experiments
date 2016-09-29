@@ -25,7 +25,7 @@ subprocess = Test()
 
 def check_paths(params):
     check_list = ["e_train_gz", "f_train_gz", "e_dev_gz", "f_dev_gz", "e_test_gz", "f_test_gz", "result_dir",
-                  "alignment_file", "language_model", "moses_dir"]
+                  "alignment_file1", "alignment_file2", "language_model", "moses_dir"]
     for c in check_list:
         if not os.path.exists(params[c]):
             raise Exception("Path does not exist for parameter %s: <%s>" % (c, params[c]))
