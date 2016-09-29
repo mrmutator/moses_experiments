@@ -1,0 +1,72 @@
+#PBS -S /bin/bash
+#PBS -lnodes=1:cores16
+#PBS -lwalltime=%(wall_time)s
+
+cd "$TMPDIR"
+
+# TRAINING
+###################################
+
+mkdir train
+mkdir train/model
+
+cp %(e_train_gz)s corpus.en.gz
+cp %(f_train_gz)s corpus.fr.gz
+#cp %(alignment_file)s aligned.grow-diag-final
+cp %(alignment_file_1)s aligned1
+cp %(alignment_file_2)s aligned2
+cp %(e_dev_gz)s tune.en.gz
+cp %(f_dev_gz)s tune.fr.gz
+cp %(e_test_gz)s test.en.gz
+cp %(f_test_gz)s test.fr.gz
+
+bash %(job_template_dir)s/parallel_merge_alignments.sh aligned1 aligned2 %(num_cores)s
+
+gunzip corpus.*.gz
+cp %(language_model)s lm.blm.en
+>&2 echo "Starting training script. ";
+%(moses_dir)s/scripts/training/train-model.perl -root-dir $PWD/train -corpus $PWD/corpus -f fr -e en -reordering msd-bidirectional-fe -lm 0:3:$PWD/lm.blm.en:8 -external-bin-dir %(moses_dir)s/tools --first-step 4 --alignment-file $PWD/aligned -cores %(num_cores)s
+
+
+rm corpus.en
+rm corpus.fr
+
+# binarizing
+>&2 echo "Starting binarizer script. ";
+mkdir binarised-model
+%(moses_dir)s/bin/processPhraseTableMin -in train/model/phrase-table.gz -nscores 4 -out binarised-model/phrase-table
+%(moses_dir)s/bin/processLexicalTableMin -in train/model/reordering-table.wbe-msd-bidirectional-fe.gz -out binarised-model/reordering-table
+
+
+# TUNING
+######################################
+
+gunzip tune.*.gz
+gunzip test.*.gz
+
+# run several times
+for it in $(seq 1 %(num_mert)s);
+ do
+ >&2 echo "Starting MERT run " ${it};
+ %(moses_dir)s/scripts/training/mert-moses.pl tune.fr tune.en %(moses_dir)s/bin/moses train/model/moses.ini --mertdir %(moses_dir)s/bin/ --decoder-flags="-threads %(num_cores)s"
+
+
+ sed -i "s/PhraseDictionaryMemory/PhraseDictionaryCompact/" mert-work/moses.ini
+ sed -i "s train/model/phrase-table.gz binarised-model/phrase-table " mert-work/moses.ini
+ sed -i "s train/model/reordering-table.wbe-msd-bidirectional-fe.gz binarised-model/reordering-table.minlexr " mert-work/moses.ini
+
+
+ # TESTING
+ ##########################################
+
+
+ >&2 echo "Filtering test set. ";
+ %(moses_dir)s/scripts/training/filter-model-given-input.pl filtered-testset mert-work/moses.ini test.fr -Binarizer %(moses_dir)s/bin/processPhraseTableMin
+
+ >&2 echo "Translating test set. ";
+ %(moses_dir)s/bin/moses -f filtered-testset/moses.ini < test.fr > %(lang_prefix)stranslated.en.$it
+
+ cp %(lang_prefix)stranslated.en.$it %(result_dir)s/
+ rm -r filtered-testset
+ rm -r mert-work
+done
