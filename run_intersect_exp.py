@@ -43,13 +43,13 @@ def get_params(args):
     params['alignment_file1'] = os.path.abspath(args.alignment_file1)
     params['alignment_file2'] = os.path.abspath(args.alignment_file2)
     params['language_model'] = os.path.join(os.path.abspath(args.corpus_dir), "lm.blm." + args.e)
-    params['job_file'] = os.path.join(params['result_dir'], "intersect.job")
+    params['lang_prefix'] = args.lang_prefix
+    params['job_file'] = os.path.join(params['result_dir'], params["lang_prefix"] +".intersect.job")
     params['job_template_dir'] = os.path.dirname(os.path.realpath(__file__))
     params['wall_time'] = args.wall_time
     params['moses_dir'] = os.path.abspath(args.moses_dir)
     params['num_cores'] = args.num_cores
     params['num_mert'] = args.num_mert
-    params['lang_prefix'] = args.lang_prefix
 
     return params
 
