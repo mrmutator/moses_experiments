@@ -21,6 +21,8 @@ cp %(f_test_gz)s test.fr.gz
 
 bash %(job_template_dir)s/parallel_merge_alignments.sh aligned1 aligned2 %(num_cores)s
 
+cp aligned.grow-diag-final %(result_dir)s/aligned.merged.%(lang_prefix)s
+
 gunzip corpus.*.gz
 cp %(language_model)s lm.blm.en
 >&2 echo "Starting training script. ";
