@@ -19,12 +19,16 @@ if __name__ == "__main__":
     arg_parser.add_argument("ref")
     arg_parser.add_argument("lang")
     arg_parser.add_argument('-reverse', dest='reverse', action='store_true', required=False)
+    arg_parser.add_argument('-intersect', dest='reverse', action='store_true', required=False)
     arg_parser.add_argument("-n", type=int, default=5)
 
     args = arg_parser.parse_args()
 
     target_dir = os.path.abspath(args.dir)
     ref_dir = os.path.abspath(args.ref)
+
+    if args.intersect:
+        cmd = "python ~/moses_experiments/intersect_multeval.py "
 
 
 
@@ -43,7 +47,7 @@ if __name__ == "__main__":
             outfile.write(job_header + "\n\n")
 
             outfile.write(cmd)
-            if args.reverse:
+            if args.reverse and not args.intersect:
                 outfile.write(" -reverse ")
             outfile.write(" -ref " + ref_dir)
             outfile.write(" -lang " + args.lang)
