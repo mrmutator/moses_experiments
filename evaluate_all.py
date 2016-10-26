@@ -19,7 +19,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("ref")
     arg_parser.add_argument("lang")
     arg_parser.add_argument('-reverse', dest='reverse', action='store_true', required=False)
-    arg_parser.add_argument('-intersect', dest='reverse', action='store_true', required=False)
+    arg_parser.add_argument('-intersect', dest='intersect', action='store_true', required=False)
     arg_parser.add_argument("-n", type=int, default=5)
 
     args = arg_parser.parse_args()
