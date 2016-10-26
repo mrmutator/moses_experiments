@@ -22,8 +22,8 @@ def evaluate(ref, baseline, hyps, prefix, multeval_path, lang):
     res = re.sub("system \d+\s*", "", res)
     res = re.sub("\s*\n", ",\n", res)
     res = re.sub("\s\s+", ",", res)
-    print stdout
-    print
+    #print stdout
+    #print
 
     print res
     print args.bl, args.hyps
